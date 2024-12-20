@@ -1,4 +1,3 @@
-// /screens/HomeScreen.js
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { collection, addDoc } from 'firebase/firestore';
@@ -6,21 +5,29 @@ import { db } from '../src/firebase';
 import { useNavigation } from '@react-navigation/native';
 
 const AddRecipeScreen = () => {
-    const [title, setTitle] = useState('');
+    const [name, setName] = useState('');
+    const [ingredients, setIngredients] = useState('');
+    const [instructions, setInstructions] = useState('');
 
     const navigation = useNavigation();
 
 
     const handleAddRecipe = async () => {
-        if (!title) return alert('Please enter a recipe name');
+        if (!name) return alert('Please enter a recipe name');
+
+        const ingredientArray = ingredients.split(',').map(item => item.trim());
 
         try {
             await addDoc(collection(db, 'recipes'), {
-                title: title,
-                createdAt: new Date()
+                name: name,
+                ingredients: ingredientArray,
+                instructions: instructions,
+                createdAt: new Date(),
             });
             alert('Recipe added Successfully');
-            setTitle('');
+            setName('');
+            setIngredients('');
+            setInstructions('');
             navigation.goBack();
         } catch (error) {
             console.error('Error adding recipe:', error);
@@ -33,8 +40,20 @@ const AddRecipeScreen = () => {
             <TextInput
             style={styles.input}
             placeholder='Recipe Name'
-            value={title}
-            onChangeText={(text) => setTitle(text)}
+            value={name}
+            onChangeText={(text) => setName(text)}
+            />
+            <TextInput 
+            style={styles.input}
+            placeholder='Ingredients (seperate with comma)'
+            value={ingredients}
+            onChangeText={(text) => setIngredients(text)}
+            />
+            <TextInput
+            style={styles.input}
+            placeholder='Instructions'
+            value={instructions}
+            onChangeText={(text) => setInstructions(text)}
             />
             <Button title="Add Recipe" onPress={handleAddRecipe} />
 
