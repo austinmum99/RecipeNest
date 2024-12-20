@@ -1,8 +1,7 @@
-// /screens/HomeScreen.js
 import { useNavigation } from '@react-navigation/native';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { db } from '../src/firebase';
 
 const HomeScreen = () => {
@@ -11,29 +10,17 @@ const HomeScreen = () => {
     const [recipes, setRecipes] = useState([]);
 
     useEffect(() => {
-        const fetchRecipes = async () => {
-            try {
-                const querySnapshot = await getDocs(collection(db, 'recipes'));
-                const recipeList = querySnapshot.docs.map((doc) => ({
-                    id: doc.id,
-                    ...doc.data()
-                }));
-                setRecipes(recipeList);
-            } catch (error) {
-                console.log('Error fetching recipes:', error);
-            }
-        };
+        const q = query(collection(db, 'recipes'), orderBy('createdAt', 'desc'));
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const recipeList = snapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            setRecipes(recipeList);
+        });
 
-        fetchRecipes();
+        return () => unsubscribe;
     }, []);
-
-    // use firebase later
-    const mockRecipes = [
-        { id: '1', title: 'Spagetti' },
-        { id: '2', title: 'Tikki Masala'},
-        { id: '3', title: 'Sheppards Pie'},
-
-    ];
 
     return (
         <View style={styles.container}>
@@ -46,9 +33,9 @@ const HomeScreen = () => {
             >
                 <Text style={styles.addButtonText}>+ Add Recipe</Text>
             </TouchableOpacity>
-            {/* Recipe List (temp) */}
+            {/* Recipe List */}
             <FlatList
-                data={mockRecipes}
+                data={recipes}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
                     <View style={styles.recipeCard}>
