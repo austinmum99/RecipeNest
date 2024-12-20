@@ -38,9 +38,12 @@ const HomeScreen = () => {
                 data={recipes}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
-                    <View style={styles.recipeCard}>
-                        <Text style={styles.recipeTitle}>{item.title}</Text>
-                    </View>
+                    <TouchableOpacity
+                        style={StyleSheet.recipeCard}
+                        onPress={() => navigation.navigate('RecipeDetails', {recipe: item })}
+                    >
+                        <Text style={styles.recipeName}>{item.name}</Text>
+                    </TouchableOpacity>
                 )}
             />
         </View>
@@ -84,7 +87,7 @@ const styles = StyleSheet.create({
         shadowRadius: 10,
         elevation: 5,
     },
-    recipeTitle: {
+    recipeName: {
         fontSize: 18,
         fontWeight: 'bold',
         color: '#333',
