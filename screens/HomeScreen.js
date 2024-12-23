@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native
 import React, { useState, useEffect } from 'react';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { db } from '../src/firebase';
+import { Swipeable } from 'react-native-gesture-handler';
 
 const HomeScreen = () => {
     const navigation = useNavigation();
@@ -42,7 +43,7 @@ const HomeScreen = () => {
                         style={StyleSheet.recipeCard}
                         onPress={() => navigation.navigate('RecipeDetails', {recipe: item })}
                     >
-                        <Text style={styles.recipeName}>{item.name}</Text>
+                        <Text style={styles.recipeName}>&#x2022;{item.name}</Text>
                     </TouchableOpacity>
                 )}
             />
@@ -78,8 +79,8 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     recipeCard: {
-        backgroundColor: '#FFF',
-        padding: 20,
+        backgroundColor: '#F8F8F8',
+        padding: 30,
         borderRadius: 10,
         marginBottom: 10,
         shadowColor: '#000',
@@ -88,7 +89,7 @@ const styles = StyleSheet.create({
         elevation: 5,
     },
     recipeName: {
-        fontSize: 18,
+        fontSize: 26,
         fontWeight: 'bold',
         color: '#333',
     },
