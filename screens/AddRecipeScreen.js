@@ -28,7 +28,7 @@ const AddRecipeScreen = () => {
             setName('');
             setIngredients('');
             setInstructions('');
-            navigation.goBack();
+            navigation.navigate('Home');
         } catch (error) {
             console.error('Error adding recipe:', error);
         }
