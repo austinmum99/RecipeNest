@@ -1,13 +1,11 @@
 import { useNavigation } from '@react-navigation/native';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Touchable } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
+import { collection, onSnapshot, query, orderBy, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../src/firebase';
 import { Swipeable } from 'react-native-gesture-handler';
-
 const HomeScreen = () => {
     const navigation = useNavigation();
-
     const [recipes, setRecipes] = useState([]);
 
     useEffect(() => {
@@ -19,10 +17,28 @@ const HomeScreen = () => {
             }));
             setRecipes(recipeList);
         });
-
-        return () => unsubscribe;
+        return () => unsubscribe();
     }, []);
-
+    const HandleDeleteRecipe = async (id) => {
+        console.log("Deleting recipe with id:", id);
+        try {
+            const recipeRef = doc(db, 'recipes', id);
+            await deleteDoc(recipeRef);
+            console.log('Recipe deleted succcessfully');
+        } catch (error){
+            console.log("Error deleting Recipe:", error);
+        }
+    };
+    const DeleteRecipes = (id) => {
+        return (
+            <TouchableOpacity
+                onPress={() => HandleDeleteRecipe(id)}
+                    style={styles.deleteContainer}
+            >
+                <Text style={styles.deleteContainerText}>Delete</Text>
+            </TouchableOpacity>
+        );
+    };
     return (
         <View style={styles.container}>
             {/* header */}
@@ -39,18 +55,22 @@ const HomeScreen = () => {
                 data={recipes}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
-                    <TouchableOpacity
-                        style={StyleSheet.recipeCard}
-                        onPress={() => navigation.navigate('RecipeDetails', {recipe: item })}
-                    >
-                        <Text style={styles.recipeName}>&#x2022;{item.name}</Text>
-                    </TouchableOpacity>
+            <Swipeable 
+                renderRightActions={ () => DeleteRecipes(item.id)}
+            >
+                <TouchableOpacity
+                    style={StyleSheet.recipeCard}
+                    onPress={() => navigation.navigate('RecipeDetails', {recipe: item })}
+                >
+                    <Text style={styles.recipeName}>&#x2022;{item.name}</Text>
+                </TouchableOpacity>
+                </Swipeable>
                 )}
             />
         </View>
-
-  );
+    );
 };
+
 
 
 const styles = StyleSheet.create({
@@ -90,9 +110,23 @@ const styles = StyleSheet.create({
     },
     recipeName: {
         fontSize: 26,
-        fontWeight: 'bold',
+        fontWeight: 'normal',
         color: '#333',
     },
+    deleteContainer: {
+        backgroundColor: '#d9534f',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: 70,
+        height: '100%',
+        borderTopRightRadius: 10,
+        borderBottomRightRadius: 10,
+    },
+    deleteContainerText: {
+        color: "#1b1a17",
+        fontWeight: 600,
+        padding: 20,
+    }
 });
 
 
