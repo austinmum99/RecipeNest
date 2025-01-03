@@ -4,6 +4,7 @@ import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../src/firebase';
 import { useNavigation } from '@react-navigation/native';
 
+
 const AddRecipeScreen = () => {
     const [name, setName] = useState('');
     const [ingredients, setIngredients] = useState('');
@@ -11,13 +12,12 @@ const AddRecipeScreen = () => {
 
     const navigation = useNavigation();
 
-
     const handleAddRecipe = async () => {
         if (!name) return alert('Please enter a recipe name');
 
-        const ingredientArray = ingredients.split(',').map(item => item.trim());
-
-        try {
+      const ingredientArray = ingredients.split(',').map(item => item.trim());
+      
+      try {
             await addDoc(collection(db, 'recipes'), {
                 name: name,
                 ingredients: ingredientArray,
@@ -28,10 +28,10 @@ const AddRecipeScreen = () => {
             setName('');
             setIngredients('');
             setInstructions('');
-            navigation.navigate('Home');
-        } catch (error) {
-            console.error('Error adding recipe:', error);
-        }
+      } catch (error) {
+          console.error('Error adding recipe:', error);
+      }
+  
     };
 
     return (
@@ -55,8 +55,13 @@ const AddRecipeScreen = () => {
             value={instructions}
             onChangeText={(text) => setInstructions(text)}
             />
-            <Button title="Add Recipe" onPress={handleAddRecipe} />
-
+            <Button 
+                title="Add Recipe" 
+                onPress={() => {
+                    handleAddRecipe();
+                    navigation.goBack();
+                }}
+            />
         </View>
   );
     
